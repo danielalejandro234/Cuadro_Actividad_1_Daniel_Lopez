@@ -1,0 +1,140 @@
+---
+##Autor_ daniel Alejandro Lopez
+title: "Trabajo de estadistica , Ciencia de datos"
+output: 
+  flexdashboard::flex_dashboard:
+    theme:
+      bg: "#FFFFFF"
+      fg: "#4D9583" 
+      primary: "#4D9583"
+      base_font:
+        google: Prompt
+      code_font:
+        google: JetBrains Mono
+    orientation: rows
+    vertical_layout: fill
+---
+
+```{r librerias}
+library(flexdashboard)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+library(tm)
+library(wordcloud)
+library(paqueteMET)
+library(ggVennDiagram)
+data=CarreraLuz22
+```
+
+
+# Metricas {data-icon=fa-ruler}
+##
+### Cantidad Participantes
+```{r}
+##selecionar cantidad de participantes
+cantidadCompetidores=length(data$id)
+
+valueBox(value = paste(cantidadCompetidores,"Atletas"), 
+         caption = "Número de participantes", 
+         icon = "fas fa-users", 
+         color = "#8E9392")
+```
+### Cantidad de Hombres
+```{r}
+##cantidad de datos hombres
+CantidadHombres_=filter(data,sex=="Hombre")
+cantidadHombres=length(CantidadHombres_$id)
+valueBox(value = paste(cantidadHombres,"Hombres"), 
+         caption = "Número de Hombres", 
+         icon = "fas fa-child", 
+         color = "#8E9392")
+
+
+```
+
+
+### Mujeres
+```{r}
+##cantidad de datos hombres
+CantidadMujeres_=filter(data,sex=="Mujer")
+cantidadMujeres=length(CantidadMujeres_$id)
+valueBox(value = paste(cantidadMujeres,"Mujeres"), 
+         caption = "Número de Mujeres", 
+         icon = "fas fa-female", 
+         color = "#8E9392")
+
+```
+
+## 
+### Tiempo Maximo en minutos
+```{r}
+##tiempo maximo en minutos
+TiempoMaximo=round(max(data$timerun/60),2)
+valueBox(value = paste(TiempoMaximo,"Tpo. maximo"), 
+         caption = "Tiempo maximo de carrera", 
+         icon = "fas fa-hourglass", 
+         color = "#AABDB9")
+```
+### Tiempo minimo en minutos
+```{r}
+##tiempo minimo en minutos
+TiempoMinimo=round(min(data$timerun/60),2)
+valueBox(value = paste(TiempoMinimo,"Tpo. Ganador"), 
+         caption = "Tiempo del ganador", 
+         icon = "	far fa-hourglass", 
+         color = "#AABDB9")
+```
+### Tiempo recurrente de carrera
+```{r}
+##Tiempo promedio de carrera
+TiempoMPromedio=round(median(data$timerun/60),2)
+valueBox(value = paste(TiempoMPromedio,"Tpo. medio"), 
+         caption = "Tiempo medio de carrera", 
+         icon = "	fas fa-hourglass-half", 
+         color = "#AABDB9")
+```
+
+
+##
+### Categorias x sexo
+```{r}
+b=ggplot(data,aes(x=categoria)) + geom_bar(aes(fill=sex),position = "dodge") 
+b + theme_dark() + scale_fill_manual(values = c("#AABDB9","#4D9583"))
+
+```
+
+### Tiempos sobre categorias
+```{r}
+c=ggplot(data, aes(x = categoria, y = timerun/60 )) 
+c+  geom_boxplot(aes(fill = categoria)) + theme_dark() 
+
+```
+
+### Categorias x sexo
+```{r}
+Theme2 = theme(
+  axis.title.x = element_text(size = 8),
+  axis.text.x = element_text(size = 8),
+  axis.title.y = element_text(size = 8),
+  # axis.text.y = element_blank(),
+  axis.text = element_text( size = 8),
+  legend.title = element_text(size = 8),
+  legend.text = element_text(size = 8),  
+  strip.text = element_text(size=8),
+  title =element_text(size=8, face='bold')
+)# tamaño letra por grupos
+paleta6=c("#447270", "#6B9493", "#F6E271", "#F6B916", "#F69312", "#BC6C25")
+p1=ggplot(data, aes(y=timerun/60, x=sex))+
+  geom_jitter(color="#034A94", size=1, alpha=0.9) +
+  aes(color=paleta6)+
+  labs(title = " ",
+       y= "tiempo - min",
+       x= "categorías")+ 
+  #facet_wrap(~ sex)
+  #facet_grid(vars(sex), scale="free")+
+  ylim(0,170)+
+  Theme2
+
+p1
+```
